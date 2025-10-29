@@ -1,14 +1,14 @@
-import type { CodegenConfig } from '@graphql-codegen/cli';
+import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: 'https://your-graphql-endpoint.com/graphql',
-  documents: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
+  schema: "https://swapi-graphql.eskerda.vercel.app",
+  documents: ["src/**/*.{ts,tsx}", "!src/**/*.d.ts"],
   generates: {
-    './src/shared/api/graphql/__generated__/': {
-      preset: 'client',
+    "./src/shared/api/graphql/__generated__/": {
+      preset: "client",
       plugins: [],
       presetConfig: {
-        gqlTagName: 'gql',
+        gqlTagName: "gql",
       },
     },
   },

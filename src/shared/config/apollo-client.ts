@@ -1,7 +1,7 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
 
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || "https://your-graphql-endpoint.com/graphql",
+  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || "https://swapi-graphql.eskerda.vercel.app",
 });
 
 export const apolloClient = new ApolloClient({
