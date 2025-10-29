@@ -1,46 +1,18 @@
-import { useQuery } from "@apollo/client/react";
-import { GET_ALL_PEOPLE } from "@shared/api/graphql/queries";
 import { Button } from "@shared/ui/Button";
-
-type Character = {
-  id: string;
-  name: string | null;
-  birthYear: string | null;
-  gender: string | null;
-  height: number | null;
-  mass: string | null;
-  homeworld: {
-    name: string | null;
-  } | null;
-  species: {
-    name: string | null;
-  } | null;
-  filmConnection: {
-    totalCount: number | null;
-  } | null;
-};
-
-type GetAllPeopleData = {
-  allPeople: {
-    people: Character[];
-    pageInfo: {
-      hasNextPage: boolean | null;
-      hasPreviousPage: boolean | null;
-      startCursor: string | null;
-      endCursor: string | null;
-    } | null;
-    totalCount: number | null;
-  } | null;
-};
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/ui/Card";
+import { Badge } from "@shared/ui/Badge";
+import { Alert, AlertDescription } from "@shared/ui/Alert";
+import { Skeleton } from "@shared/ui/Skeleton";
+import { useGetAllPeopleQuery } from "@shared/api/graphql/__generated__/hooks";
 
 export const StarWarsCharacters = () => {
-  const { data, loading, error, fetchMore } = useQuery<GetAllPeopleData>(GET_ALL_PEOPLE, {
+  const { data, loading, error, fetchMore } = useGetAllPeopleQuery({
     variables: { first: 10 },
     notifyOnNetworkStatusChange: true,
   });
 
   const handleLoadMore = () => {
-    if (data?.allPeople?.pageInfo?.hasNextPage) {
+    if (data?.allPeople?.pageInfo?.hasNextPage && data.allPeople.pageInfo.endCursor) {
       fetchMore({
         variables: {
           first: 10,
@@ -52,17 +24,38 @@ export const StarWarsCharacters = () => {
 
   if (loading && !data) {
     return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-lg">Loading characters...</div>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-6 w-32" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Card key={index}>
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-800">Error loading characters: {error.message}</p>
-      </div>
+      <Alert variant="destructive">
+        <AlertDescription>
+          Error loading characters: {error.message}
+        </AlertDescription>
+      </Alert>
     );
   }
 
@@ -71,47 +64,65 @@ export const StarWarsCharacters = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Star Wars Characters</h2>
-        <p className="text-sm text-gray-600">
+        <h2 className="text-2xl font-bold text-foreground">Star Wars Characters</h2>
+        <Badge variant="secondary">
           Total: {data?.allPeople?.totalCount ?? 0} characters
-        </p>
+        </Badge>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {characters.map((character: Character) => (
-          <div
-            key={character.id}
-            className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-          >
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{character.name}</h3>
-            <div className="space-y-1 text-sm text-gray-600">
-              <p>
-                <span className="font-medium">Birth Year:</span> {character.birthYear || "Unknown"}
-              </p>
-              <p>
-                <span className="font-medium">Gender:</span> {character.gender || "Unknown"}
-              </p>
-              <p>
-                <span className="font-medium">Height:</span> {character.height || "Unknown"} cm
-              </p>
-              <p>
-                <span className="font-medium">Mass:</span> {character.mass || "Unknown"} kg
-              </p>
-              {character.homeworld?.name && (
-                <p>
-                  <span className="font-medium">Homeworld:</span> {character.homeworld.name}
-                </p>
-              )}
-              {character.species?.name && (
-                <p>
-                  <span className="font-medium">Species:</span> {character.species.name}
-                </p>
-              )}
-              <p>
-                <span className="font-medium">Films:</span> {character.filmConnection?.totalCount ?? 0}
-              </p>
-            </div>
-          </div>
+        {characters
+          .filter((character): character is NonNullable<typeof character> => character !== null)
+          .map((character) => (
+          <Card key={character.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle>{character.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Birth Year:</span>
+                  <span className="font-medium">{character.birthYear || "Unknown"}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Gender:</span>
+                  <Badge variant="outline" className="text-xs">
+                    {character.gender || "Unknown"}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Height:</span>
+                  <span className="font-medium">{character.height || "Unknown"} cm</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Mass:</span>
+                  <span className="font-medium">{character.mass || "Unknown"} kg</span>
+                </div>
+                {character.homeworld?.name && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Homeworld:</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {character.homeworld.name}
+                    </Badge>
+                  </div>
+                )}
+                {character.species?.name && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Species:</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {character.species.name}
+                    </Badge>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Films:</span>
+                  <Badge variant="default" className="text-xs">
+                    {character.filmConnection?.totalCount ?? 0}
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 

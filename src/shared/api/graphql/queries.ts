@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_ALL_PEOPLE = gql`
-  query GetAllPeople($first: Int) {
-    allPeople(first: $first) {
+  query GetAllPeople($first: Int, $after: String) {
+    allPeople(first: $first, after: $after) {
       people {
         id
         name
@@ -47,7 +47,7 @@ export const GET_PERSON = gql`
         name
         population
         diameter
-        climate
+        climates
       }
       species {
         name

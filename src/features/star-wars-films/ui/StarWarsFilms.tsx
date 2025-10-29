@@ -1,43 +1,41 @@
-import { useQuery } from "@apollo/client/react";
-import { GET_ALL_FILMS } from "@shared/api/graphql/queries";
-
-type Film = {
-  id: string;
-  title: string | null;
-  episodeID: number | null;
-  openingCrawl: string | null;
-  director: string | null;
-  producers: string[] | null;
-  releaseDate: string | null;
-  characterConnection: {
-    characters: Array<{
-      name: string | null;
-    } | null>;
-  } | null;
-};
-
-type GetAllFilmsData = {
-  allFilms: {
-    films: Film[];
-  } | null;
-};
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/ui/Card";
+import { Badge } from "@shared/ui/Badge";
+import { Alert, AlertDescription } from "@shared/ui/Alert";
+import { Skeleton } from "@shared/ui/Skeleton";
+import { useGetAllFilmsQuery } from "@shared/api/graphql/__generated__/hooks";
 
 export const StarWarsFilms = () => {
-  const { data, loading, error } = useQuery<GetAllFilmsData>(GET_ALL_FILMS);
+  const { data, loading, error } = useGetAllFilmsQuery();
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-lg">Loading films...</div>
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Card key={index}>
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-20 w-full mb-4" />
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-800">Error loading films: {error.message}</p>
-      </div>
+      <Alert variant="destructive">
+        <AlertDescription>
+          Error loading films: {error.message}
+        </AlertDescription>
+      </Alert>
     );
   }
 
@@ -45,61 +43,69 @@ export const StarWarsFilms = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-gray-900">Star Wars Films</h2>
+      <h2 className="text-2xl font-bold text-foreground">Star Wars Films</h2>
 
       <div className="space-y-4">
-        {films.map((film: Film) => (
-          <div
-            key={film.id}
-            className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-1">
-                  Episode {film.episodeID}: {film.title}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Released: {film.releaseDate} | Director: {film.director}
-                </p>
-              </div>
-            </div>
-
-            {film.openingCrawl && (
-              <div className="mb-4 p-4 bg-gray-50 border border-gray-100 rounded italic text-gray-700 text-sm leading-relaxed">
-                {film.openingCrawl.substring(0, 200)}
-                {film.openingCrawl.length > 200 ? "..." : ""}
-              </div>
-            )}
-
-            {film.producers && film.producers.length > 0 && (
-              <p className="text-sm text-gray-600 mb-2">
-                <span className="font-medium">Producers:</span> {film.producers.join(", ")}
-              </p>
-            )}
-
-            {film.characterConnection?.characters && film.characterConnection.characters.length > 0 && (
-              <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Featured Characters:</p>
-                <div className="flex flex-wrap gap-2">
-                  {film.characterConnection.characters.slice(0, 5).map((character: { name: string | null } | null, index: number) => (
-                    character && (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                      >
-                        {character.name}
-                      </span>
-                    )
-                  ))}
-                  {film.characterConnection.characters.length > 5 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                      +{film.characterConnection.characters.length - 5} more
-                    </span>
-                  )}
+        {films
+          .filter((film): film is NonNullable<typeof film> => film !== null)
+          .map((film) => (
+          <Card key={film.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1">
+                  <CardTitle className="mb-2">
+                    Episode {film.episodeID}: {film.title}
+                  </CardTitle>
+                  <CardDescription>
+                    Released: {film.releaseDate} | Director: {film.director}
+                  </CardDescription>
                 </div>
               </div>
-            )}
-          </div>
+            </CardHeader>
+
+            <CardContent>
+              {film.openingCrawl && (
+                <div className="mb-4 p-4 bg-muted rounded-md italic text-muted-foreground text-sm leading-relaxed">
+                  {film.openingCrawl.substring(0, 200)}
+                  {film.openingCrawl.length > 200 ? "..." : ""}
+                </div>
+              )}
+
+              {film.producers && film.producers.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-foreground mb-2">Producers:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {film.producers.map((producer, index) => (
+                      <Badge key={index} variant="secondary">
+                        {producer}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {film.characterConnection?.characters && film.characterConnection.characters.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-foreground mb-2">Featured Characters:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {film.characterConnection.characters
+                      .filter((character): character is NonNullable<typeof character> => character !== null)
+                      .slice(0, 5)
+                      .map((character, index) => (
+                        <Badge key={index} variant="default">
+                          {character.name}
+                        </Badge>
+                      ))}
+                    {film.characterConnection.characters.length > 5 && (
+                      <Badge variant="outline">
+                        +{film.characterConnection.characters.length - 5} more
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
