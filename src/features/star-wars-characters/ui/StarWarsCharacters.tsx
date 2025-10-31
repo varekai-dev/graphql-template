@@ -78,13 +78,13 @@ export const StarWarsCharacters = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {isLoadingInitial
-          ? Array.from({ length: 6 }).map((_, index) => (
-              <Card key={index}>
+          ? Array.from({ length: 10 }).map((_, index) => (
+              <Card key={index} className="flex flex-col">
                 <CardHeader>
                   <Skeleton className="h-6 w-3/4" />
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
+                <CardContent className="flex-1">
+                  <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
                       <Skeleton className="h-4 w-20" />
                       <Skeleton className="h-4 w-16" />
@@ -106,6 +106,10 @@ export const StarWarsCharacters = () => {
                       <Skeleton className="h-5 w-16 rounded-full" />
                     </div>
                     <div className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                    </div>
+                    <div className="flex items-center justify-between">
                       <Skeleton className="h-4 w-14" />
                       <Skeleton className="h-5 w-10 rounded-full" />
                     </div>
@@ -117,11 +121,11 @@ export const StarWarsCharacters = () => {
         {characters
           .filter((character): character is NonNullable<typeof character> => character !== null)
           .map((character) => (
-            <Card key={character.id} className="hover:shadow-lg transition-shadow">
+            <Card key={character.id} className="flex flex-col hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle>{character.name}</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1">
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Birth Year:</span>
@@ -141,22 +145,26 @@ export const StarWarsCharacters = () => {
                     <span className="text-muted-foreground">Mass:</span>
                     <span className="font-medium">{character.mass || "Unknown"} kg</span>
                   </div>
-                  {character.homeworld?.name && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Homeworld:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Homeworld:</span>
+                    {character.homeworld?.name ? (
                       <Badge variant="secondary" className="text-xs">
                         {character.homeworld.name}
                       </Badge>
-                    </div>
-                  )}
-                  {character.species?.name && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Species:</span>
+                    ) : (
+                      <span className="font-medium">Unknown</span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Species:</span>
+                    {character.species?.name ? (
                       <Badge variant="secondary" className="text-xs">
                         {character.species.name}
                       </Badge>
-                    </div>
-                  )}
+                    ) : (
+                      <span className="font-medium">Unknown</span>
+                    )}
+                  </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Films:</span>
                     <Badge variant="default" className="text-xs">
@@ -169,13 +177,13 @@ export const StarWarsCharacters = () => {
           ))}
         {loading && data && (
           <>
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Card key={`loading-${index}`}>
+            {Array.from({ length: 10 }).map((_, index) => (
+              <Card key={`loading-${index}`} className="flex flex-col">
                 <CardHeader>
                   <Skeleton className="h-6 w-3/4" />
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
+                <CardContent className="flex-1">
+                  <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
                       <Skeleton className="h-4 w-20" />
                       <Skeleton className="h-4 w-16" />
@@ -191,6 +199,10 @@ export const StarWarsCharacters = () => {
                     <div className="flex items-center justify-between">
                       <Skeleton className="h-4 w-12" />
                       <Skeleton className="h-4 w-20" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-5 w-16 rounded-full" />
                     </div>
                     <div className="flex items-center justify-between">
                       <Skeleton className="h-4 w-20" />
