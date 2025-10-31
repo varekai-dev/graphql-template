@@ -1,6 +1,7 @@
 import { Header } from "@widgets/header";
 import { StarWarsCharacters } from "@features/star-wars-characters";
 import { StarWarsFilms } from "@features/star-wars-films";
+import { UserForm } from "@features/user-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/ui/Tabs";
 
 export const HomePage = () => {
@@ -17,12 +18,16 @@ export const HomePage = () => {
           <TabsList className="mb-6">
             <TabsTrigger value="characters">Characters</TabsTrigger>
             <TabsTrigger value="films">Films</TabsTrigger>
+            <TabsTrigger value="form">Form Example</TabsTrigger>
           </TabsList>
           <TabsContent value="characters">
             <StarWarsCharacters />
           </TabsContent>
           <TabsContent value="films">
             <StarWarsFilms />
+          </TabsContent>
+          <TabsContent value="form">
+            <UserForm />
           </TabsContent>
         </Tabs>
       </main>
